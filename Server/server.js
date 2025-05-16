@@ -33,6 +33,7 @@ app.use('/category', require('./routes/categoryRouter'))
 app.use('/reviews', require('./routes/reviewRoutes'));
 app.use('/payments', require('./routes/paymentRoutes'));
 app.use('/orders', require('./routes/orderRoutes'));
+app.use('/count', require('./routes/countRoutes'));
 
 mongoose.connection.once('open', () => {
   console.log('MongoDB connection established');
