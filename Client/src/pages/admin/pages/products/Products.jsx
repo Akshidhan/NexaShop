@@ -39,18 +39,9 @@ const Products = () => {
     setLoading(true)
     setError(null)
     
-    const baseUrl = import.meta.env.VITE_BASE_URL
-    const token = localStorage.getItem('token')
-    
-    if (!token) {
-      setError('No authentication token')
-      setLoading(false)
-      return
-    }
-    
     // Fetch unapproved (inactive) products in its own try-catch block
     try {
-      const unapprovedResponse = await api.get(`${baseUrl}/products/inactive?page=${unapprovedCurrentPage}&limit=${limit}`)
+      const unapprovedResponse = await api.get(`/products/inactive?page=${unapprovedCurrentPage}&limit=${limit}`)
       setUnapprovedProducts(unapprovedResponse.data.products || [])
       setUnapprovedTotalPages(unapprovedResponse.data.totalPages || 1)
       setUnapprovedTotalProducts(unapprovedResponse.data.totalProducts || 0)
@@ -62,7 +53,7 @@ const Products = () => {
     
     // Fetch approved (active) products in its own try-catch block
     try {
-      const approvedResponse = await api.get(`${baseUrl}/products?page=${approvedCurrentPage}&limit=${limit}`)
+      const approvedResponse = await api.get(`/products?page=${approvedCurrentPage}&limit=${limit}`)
       setApprovedProducts(approvedResponse.data.products || [])
       setApprovedTotalPages(approvedResponse.data.pagination.totalPages || 1)
       setApprovedTotalProducts(approvedResponse.data.pagination.totalProducts || 0)
@@ -88,31 +79,17 @@ const Products = () => {
 
   const confirmAction = async () => {
     if (!selectedProduct) return
-    console.log(selectedProduct)
     
     try {
       setLoading(true)
       
-      const baseUrl = import.meta.env.VITE_BASE_URL
-      const token = localStorage.getItem('token')
-      
-      if (!token) {
-        setError('No authentication token')
-        setLoading(false)
-        return
-      }
-      
       if (actionType === 'approve') {
-        await api.put(`${baseUrl}/products/${selectedProduct._id}`, {
+        await api.put(`/products/${selectedProduct._id}`, {
           status: 'active'
         })
       } else if (actionType === 'disapprove') {
-        await api.put(`${baseUrl}/products/${selectedProduct._id}`, {
+        await api.put(`/products/${selectedProduct._id}`, {
           status: 'inactive'
-        }, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
         })
       }
       

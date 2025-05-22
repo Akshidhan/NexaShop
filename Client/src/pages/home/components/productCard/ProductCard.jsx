@@ -2,7 +2,10 @@ import React from 'react';
 import './productCard.css';
 
 function ProductCard({ product }) {
-  const { name, price, image, discount, category } = product;
+  const name = product.name;
+  const price = product.basePrice;
+  const image = product.mainImage?.url;
+  const category = product.category?.name || 'Product';
   
   return (
     <div className="product-card">
@@ -13,7 +16,7 @@ function ProductCard({ product }) {
         <span className="product-category">{category}</span>
         <h3 className="product-name">{name}</h3>
         <div className="product-price">
-            <span className="regular-price">${price}</span>
+            <span className="regular-price">Rs. {price}</span>
         </div>
         <button className="add-to-cart-btn">Add to Cart</button>
       </div>

@@ -63,7 +63,7 @@ function ProductCarousel({ products, title = "Featured Products" }) {
             >
               {products.map((product, index) => (
                 <div 
-                  key={product.id} 
+                  key={product._id}
                   className="carousel-item flex-shrink-0" 
                   style={{ width: `calc(100% / ${productsPerView})` }}
                 >

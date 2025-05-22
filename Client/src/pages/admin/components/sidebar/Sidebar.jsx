@@ -1,4 +1,4 @@
-import { HiHome, HiMiniUser, HiShoppingCart, HiMiniClipboardDocumentList, HiChatBubbleLeftEllipsis, HiArrowRightOnRectangle } from "react-icons/hi2";
+import { HiHome, HiMiniUser, HiShoppingCart, HiMiniClipboardDocumentList, HiChatBubbleLeftEllipsis, HiArrowRightOnRectangle, HiTag } from "react-icons/hi2";
 import './sidebar.scss';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -61,6 +61,18 @@ const Sidebar = () => {
             >
               <HiShoppingCart className="size-6" />
               <span className="ml-2 text-sm font-medium">Products</span>
+            </NavLink>
+            
+            <NavLink 
+              to="/admin/categories" 
+              className={({ isActive }) => 
+                `flex items-center w-full h-12 px-3 mt-2 rounded ${
+                  isActive ? 'text-gray-200 bg-gray-700' : 'hover:bg-gray-700 hover:text-gray-300'
+                }`
+              }
+            >
+              <HiTag className="size-6" />
+              <span className="ml-2 text-sm font-medium">Categories</span>
             </NavLink>
             
             <NavLink 

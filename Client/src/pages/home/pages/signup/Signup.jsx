@@ -1,11 +1,18 @@
 import { useState } from 'react';
 import './signup.scss';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import signin from '/signin.jpg';
 import logo from '/Nexashop.png';
 
+import api from '../../../../utils/axios';
+
 function Signup() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -21,8 +28,9 @@ function Signup() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
         if(formData.username === '' || formData.email === '' || formData.password === '' || formData.confirmPassword === '') {
             alert("Please fill in all fields");
             return;
@@ -33,7 +41,25 @@ function Signup() {
             alert("Passwords don't match");
             return;
         }
-        // Here you would typically call an API to register the user
+        
+        try {
+            const response = await api.post('/auth/signup', {
+                username: formData.username,
+                email: formData.email,
+                password: formData.password,
+                role: 'user'
+            })
+            
+            if (response.data) {
+                navigate('/signin')
+                
+            } else {
+                alert("Invalid signup response");
+            }
+        } catch (error) {
+            alert("Signup error:", error);
+        }
+        
     };
 
     return (

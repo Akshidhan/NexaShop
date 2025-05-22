@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Category = require('../models/category.model');
+const cloudinary = require('../config/cloudinary');
 
 const getAllCategory = async (req, res) => {
     try {
@@ -14,7 +15,7 @@ const getAllCategory = async (req, res) => {
 }
 
 const createCategory = async (req, res) => {
-    const { name } = req.body;
+    const { name, description } = req.body;
     if (!name) {
         return res.status(400).json({ message: 'Category name is required' });
     }
@@ -23,7 +24,39 @@ const createCategory = async (req, res) => {
         if (existingCategory) {
             return res.status(409).json({ message: 'Category already exists' });
         }
-        const newCategory = new Category({ name });
+
+        let imageData = {};
+        // Handle image upload if a file is provided
+        if (req.file) {
+            // Upload image to Cloudinary
+            const cloudinaryResult = await new Promise((resolve, reject) => {
+                cloudinary.uploader.upload_stream(
+                    {
+                        folder: 'ecommerce-categories',
+                        format: 'webp',
+                        quality: 'auto'
+                    },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                ).end(req.file.buffer);
+            });
+
+            // Store image data
+            image = {
+                url: cloudinaryResult.secure_url,
+                publicId: cloudinaryResult.public_id
+            };
+        }
+
+        // Create new category with image if available
+        const newCategory = new Category({ 
+            name,
+            description,
+            image
+        });
+        
         await newCategory.save();
         return res.status(201).json(newCategory);
     } catch (error) {

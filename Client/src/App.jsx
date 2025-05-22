@@ -18,11 +18,13 @@ import SellerLogin from "./pages/seller/pages/login/SellerLogin.jsx";
 import Home from "./pages/home/Homepage.jsx";
 import Signin from "./pages/home/pages/signin/Signin.jsx";
 import Signup from "./pages/home/pages/signup/Signup.jsx";
+import Userpanel from "./pages/home/pages/userpanel/Userpanel.jsx";
 
 // Importing the admin components
 import AdminDashboard from "./pages/admin/pages/dashboard/Dashboard.jsx";
 import AdminUsers from "./pages/admin/pages/users/Users.jsx";
 import AdminProducts from "./pages/admin/pages/products/Products.jsx";
+import AdminCategories from "./pages/admin/pages/categories/Categories.jsx";
 import AdminReviews from "./pages/admin/pages/reviews/Reviews.jsx";
 import AdminOrders from "./pages/admin/pages/orders/Orders.jsx";
 
@@ -100,6 +102,7 @@ function App() {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="products" element={<AdminProducts />} />
+            <Route path="categories" element={<AdminCategories />} />
             <Route path="reviews" element={<AdminReviews />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="adminPanel" element={<AdminDashboard />} />
@@ -109,6 +112,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/userpanel" element={<Userpanel />} />
 
           {/*Seller Routes*/}
           <Route path="/seller/login" element={<SellerLogin />} />
