@@ -9,3 +9,11 @@
 button:hover {
   cursor: pointer;
 }
+
+.DMSerif {
+  font-family: 'DM Serif Text', serif;
+}
+
+*{
+  box-sizing: border-box;
+}

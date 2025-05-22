@@ -1,42 +1,132 @@
 import './App.css'
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginSuccess, logout } from './store/slices/userSlice';
+
+// Admin imports
 import Admin from "./pages/admin/Admin.jsx";
 import AdminPanel from "./pages/admin/pages/home/AdminPanel.jsx";
-import Login from "./pages/admin/pages/login/Login.jsx";
+import AdminLogin from "./pages/admin/pages/login/AdminLogin.jsx";
 
-// import Home from "./pages/home/Home.jsx";
-// import Seller from "./pages/seller/Seller.jsx";
+// Seller imports
+import Seller from "./pages/seller/Seller.jsx";
+import SellerPanel from "./pages/seller/pages/home/SellerPanel.jsx";
+import SellerLogin from "./pages/seller/pages/login/SellerLogin.jsx";
 
-// Import or create these dashboard components
-import Dashboard from "./pages/admin/pages/dashboard/Dashboard.jsx";
-const Users = () => <h1>Users Management</h1>;
-const Products = () => <h1>Products Management</h1>;
-const Reviews = () => <h1>Reviews Management</h1>;
-const Orders = () => <h1>Orders Management</h1>;
+//Home imports
+import Home from "./pages/home/Homepage.jsx";
+import Signin from "./pages/home/pages/signin/Signin.jsx";
+import Signup from "./pages/home/pages/signup/Signup.jsx";
+
+// Importing the admin components
+import AdminDashboard from "./pages/admin/pages/dashboard/Dashboard.jsx";
+import AdminUsers from "./pages/admin/pages/users/Users.jsx";
+import AdminProducts from "./pages/admin/pages/products/Products.jsx";
+import AdminReviews from "./pages/admin/pages/reviews/Reviews.jsx";
+import AdminOrders from "./pages/admin/pages/orders/Orders.jsx";
+
+// Importing the seller components
+import SellerDashboard from "./pages/seller/pages/dashboard/Dashboard.jsx";
+import SellerProducts from "./pages/seller/pages/products/Products.jsx";
+import SellerReviews from "./pages/seller/pages/reviews/Reviews.jsx";
+import SellerOrders from "./pages/seller/pages/orders/Orders.jsx";
 
 function App() {
+  const dispatch = useDispatch();
+  const { isAuthenticated, loading } = useSelector(state => state.user);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        
+        console.log('JWT payload:', payload);
+
+        // Extract ID and role from the token payload
+        // Check for different possible structures of the token
+        let userId, userRole;
+        
+        if (payload.UserInfo) {
+          // If the token has a UserInfo structure
+          userId = payload.UserInfo.id;
+          userRole = payload.UserInfo.role;
+        } else if (payload.id && payload.role) {
+          // If the token has direct id and role properties
+          userId = payload.id;
+          userRole = payload.role;
+        } else if (payload.sub) {
+          // Some JWT tokens use 'sub' for the subject (user id)
+          userId = payload.sub;
+          userRole = payload.role || payload.authorities;
+        }
+        
+        
+        if (userId) {
+          
+          dispatch(loginSuccess({
+            id: userId,
+            role: userRole,
+            accessToken: token
+          }));
+        } else {
+          console.warn('Token found but missing user info');
+          localStorage.removeItem('token');
+          dispatch(logout());
+        }
+      } catch (error) {
+        console.error('Failed to parse JWT token:', error);
+        localStorage.removeItem('token');
+        dispatch(logout());
+      }
+    }
+  }, [dispatch]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Initializing app...</div>;
+  }
+
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Admin routes */}
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin/login" element={<Login />} />
-        
-        {/* AdminPanel with nested routes */}
-        <Route path="/admin" element={<AdminPanel />}>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="users" element={<Users />} />
-          <Route path="products" element={<Products />} />
-          <Route path="reviews" element={<Reviews />} />
-          <Route path="orders" element={<Orders />} />
-          {/* Default route when accessing /admin/adminPanel */}
-          <Route path="adminPanel" element={<Dashboard />} />
-        </Route>
-        
-        {/* <Route path="/home" element={<Home />} /> */}
-        {/* <Route path="/seller" element={<Seller />} /> */}
-      </Routes>
-    </BrowserRouter>
+    <>
+      <BrowserRouter>
+        <Routes>
+          {/* Admin routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          
+          {/* AdminPanel with nested routes */}
+          <Route path="/admin" element={<AdminPanel />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="reviews" element={<AdminReviews />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="adminPanel" element={<AdminDashboard />} />
+          </Route>
+          
+          {/* Homepage routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/signin" element={<Signin />} />
+          <Route path="/signup" element={<Signup />} />
+
+          {/*Seller Routes*/}
+          <Route path="/seller/login" element={<SellerLogin />} />
+
+          <Route path="/seller" element={<SellerPanel />}>
+            <Route index element={<SellerDashboard />} />
+            <Route path="dashboard" element={<SellerDashboard />} />
+            <Route path="products" element={<SellerProducts />} />
+            <Route path="reviews" element={<SellerReviews />} />
+            <Route path="orders" element={<SellerOrders />} />
+            <Route path="sellerPanel" element={<SellerDashboard />} />
+          </Route>
+          
+          {/* Redirect to homepage if no match */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 

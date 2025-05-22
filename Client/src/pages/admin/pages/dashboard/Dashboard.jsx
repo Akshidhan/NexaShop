@@ -5,29 +5,65 @@ import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const Dashboard = () => {
   const [userCount, setUserCount] = useState(0);
+  const [productCount, setProductCount] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [Past7Days, setPast7Days] = useState([]);
+  const { isAuthenticated } = useSelector(state => state.user);
+
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+
+  // Update the document title when component mounts
+  useEffect(() => {
+    document.title = 'Admin Dashboard | Nexashop';
+    
+    // Optionally restore the original title when component unmounts
+    return () => {
+      document.title = 'Nexashop';
+    };
+  }, []);
 
   useEffect(() => {
-    const fetchUserCount = async () => {
+    const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
-        // Replace with your actual API endpoint
-        const response = await axios.get('/api/users/count');
-        setUserCount(response.data.count);
+
+        const token = localStorage.getItem('adminToken');
+
+        const config = {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        };
+
+        // Fetch all counts in parallel with auth headers
+        const [usersResponse, productsResponse, orderResponse, weekResponse] = await Promise.all([
+          axios.get(`${baseUrl}/count/users`, config),
+          axios.get(`${baseUrl}/count/products`, config),
+          axios.get(`${baseUrl}/count/orders`, config),
+          axios.get(`${baseUrl}/count/users-7-days`, config)
+        ]);
+
+        // Update state with fetched data
+        setUserCount(usersResponse.data.count);
+        setProductCount(productsResponse.data.count);
+        setOrderCount(orderResponse.data.count);
+        setPast7Days(weekResponse.data);
       } catch (error) {
-        console.error('Failed to fetch user count:', error);
-        // Fallback to default value if API call fails
-        setUserCount(1205);
+        console.error('Failed to fetch dashboard data:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchUserCount();
-  }, []);
+    if (isAuthenticated) {
+      fetchDashboardData();
+    }
+  }, [isAuthenticated, baseUrl]);
 
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -46,7 +82,7 @@ const Dashboard = () => {
     datasets: [
       {
         label: 'New Users',
-        data: [12, 19, 10, 15, 22, 30, 25],
+        data: Past7Days,
         borderColor: 'rgba(75, 192, 192, 1)',
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         tension: 0,
@@ -81,16 +117,16 @@ const Dashboard = () => {
         <DetailCard
           name="Total Products"
           icon={<HiShoppingBag className="size-15" />}
-          detail="354"
+          detail={isLoading ? 'Loading...' : productCount}
         />
         <DetailCard
-          name="Revenue"
+          name="Pending Orders"
           icon={<HiCurrencyDollar className="size-15" />}
-          detail="$24,350"
+          detail={isLoading ? 'Loading...' : `${orderCount.toLocaleString()}`}
         />
       </div>
 
-      <div className="chart mt-10">
+      <div className="chart mt-10 max-w-3/4 mx-auto">
         <Line data={data} options={options} />
       </div>
     </>

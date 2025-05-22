@@ -1,0 +1,141 @@
+.product-carousel {
+  background-color: #f7f8fc;
+}
+
+.carousel-container {
+  padding: 20px 0;
+  position: relative;
+}
+
+.carousel-viewport {
+  width: 100%;
+  overflow: hidden;
+  margin: 0 auto;
+  padding: 0 60px; /* Make room for navigation buttons */
+}
+
+.carousel-content {
+  display: flex;
+  gap: 20px;
+  /* Enhanced transition for smoother animation */
+  transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: transform; /* Performance optimization */
+}
+
+.carousel-item {
+  opacity: 0.85;
+  transform: scale(0.95);
+  transition: all 0.5s ease;
+}
+
+
+/* Enhanced navigation buttons */
+.carousel-nav-btn {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.carousel-nav-btn:hover {
+  background-color: #B6B6D5;
+  color: white;
+  transform: scale(1.1);
+}
+
+.carousel-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Indicators styling */
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ddd;
+  margin: 0 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.indicator.active {
+  background-color: #B6B6D5;
+  transform: scale(1.2);
+}
+
+/* Section title styling */
+.carousel-title {
+  position: relative;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+
+.carousel-title:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background-color: #B6B6D5;
+}
+
+/* Added animation for slide entering and exiting */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .carousel-content > div {
+    width: 50%;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-content > div {
+    width: 100%;
+  }
+  
+  .carousel-viewport {
+    padding: 0 40px;
+  }
+}

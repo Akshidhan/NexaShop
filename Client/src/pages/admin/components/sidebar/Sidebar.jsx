@@ -1,13 +1,21 @@
-import { HiHome, HiMiniUser, HiShoppingCart, HiMiniClipboardDocumentList, HiChatBubbleLeftEllipsis } from "react-icons/hi2";
+import { HiHome, HiMiniUser, HiShoppingCart, HiMiniClipboardDocumentList, HiChatBubbleLeftEllipsis, HiArrowRightOnRectangle } from "react-icons/hi2";
 import './sidebar.scss';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../../../store/slices/userSlice';
 
 const Sidebar = () => {
   const location = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  // Helper function to determine if a link is active
   const isActive = (path) => {
     return location.pathname === path;
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/admin/login');
   };
 
   return (
@@ -79,6 +87,15 @@ const Sidebar = () => {
               <span className="ml-2 text-sm font-medium">Orders</span>
             </NavLink>
           </div>
+        </div>
+        <div className="flex items-center justify-center w-full mt-auto border-t border-gray-700 py-3">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center w-full h-12 px-5 rounded hover:bg-gray-700 hover:text-gray-300"
+          >
+            <HiArrowRightOnRectangle className="size-6" />
+            <span className="ml-2 text-sm font-medium">Logout</span>
+          </button>
         </div>
       </div>
     </>

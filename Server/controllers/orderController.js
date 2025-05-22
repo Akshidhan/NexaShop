@@ -21,8 +21,32 @@ const getOrderById = async (req, res) => {
 // GET / - Get all the order details
 const getAllOrders = async (req, res) => {
     try {
-        const orders = await Order.find().populate('user').lean();
-        res.json(orders);
+        // Get pagination parameters from query
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        // Count total orders for pagination metadata
+        const totalOrders = await Order.countDocuments();
+        
+        // Get paginated orders
+        const orders = await Order.find()
+            .skip(skip)
+            .limit(limit)
+            .populate('user', 'name')
+            .populate('items.product', 'name price')
+            .lean();
+
+        // Return orders with pagination metadata
+        res.json({
+            orders,
+            pagination: {
+                totalOrders,
+                totalPages: Math.ceil(totalOrders / limit),
+                currentPage: page,
+                limit
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -143,6 +167,123 @@ const deleteOrder = async (req, res) => {
     }
 };
 
+// GET /seller/:sellerId - Get finished orders (cancelled and delivered) for a seller
+const getFinishedOrdersBySeller = async (req, res) => {
+    const { sellerId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    try {
+        // Count total finished orders for this seller
+        const totalOrders = await Order.countDocuments({
+            'items.product.seller': sellerId,
+            status: { $in: ['delivered', 'cancelled'] }
+        });
+
+        // Get paginated finished orders
+        const orders = await Order.find({
+            'items.product.seller': sellerId,
+            status: { $in: ['delivered', 'cancelled'] }
+        })
+            .skip(skip)
+            .limit(limit)
+            .populate('user', 'username')
+            .populate('items.product', 'name price')
+            .lean();
+
+        res.json({
+            orders,
+            pagination: {
+                totalOrders,
+                totalPages: Math.ceil(totalOrders / limit),
+                currentPage: page,
+                limit
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+// GET /seller/:sellerId/pending - Get pending orders (processing and shipped) for a seller
+const getPendingOrdersBySeller = async (req, res) => {
+    const { sellerId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    try {
+        // Count total pending orders for this seller
+        const totalOrders = await Order.countDocuments({
+            'items.product.seller': sellerId,
+            status: { $in: ['processing', 'shipped'] }
+        });
+
+        // Get paginated pending orders
+        const orders = await Order.find({
+            'items.product.seller': sellerId,
+            status: { $in: ['processing', 'shipped'] }
+        })
+            .skip(skip)
+            .limit(limit)
+            .populate('user', 'username')
+            .populate('items.product', 'name price')
+            .lean();
+
+        res.json({
+            orders,
+            pagination: {
+                totalOrders,
+                totalPages: Math.ceil(totalOrders / limit),
+                currentPage: page,
+                limit
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+// GET /seller/:sellerId/pending-payment - Get orders with pending payment for a seller
+const getPendingPaymentOrdersBySeller = async (req, res) => {
+    const { sellerId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    try {
+        // Count total pending payment orders for this seller
+        const totalOrders = await Order.countDocuments({
+            'items.product.seller': sellerId,
+            paymentStatus: 'pending'
+        });
+
+        // Get paginated pending payment orders
+        const orders = await Order.find({
+            'items.product.seller': sellerId,
+            paymentStatus: 'pending'
+        })
+            .skip(skip)
+            .limit(limit)
+            .populate('user', 'username')
+            .populate('items.product', 'name price')
+            .lean();
+
+        res.json({
+            orders,
+            pagination: {
+                totalOrders,
+                totalPages: Math.ceil(totalOrders / limit),
+                currentPage: page,
+                limit
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 module.exports = {
     getOrderById,
     getAllOrders,
@@ -151,5 +292,8 @@ module.exports = {
     createOrder,
     updateOrderStatus,
     updatePaymentStatus,
-    deleteOrder
+    deleteOrder,
+    getFinishedOrdersBySeller,
+    getPendingOrdersBySeller,
+    getPendingPaymentOrdersBySeller
 };

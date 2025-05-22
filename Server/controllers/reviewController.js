@@ -13,11 +13,48 @@ const getReviewsOfUser = async (req, res) => {
         if (!reviews.length) {
             return res.status(404).json({ status: 'error', message: 'No reviews found for this user' });
         }
-        res.json({ status: 'success', data: reviews });
+        res.status(200).json(reviews);
     } catch (error) {
         res.status(500).json({ status: 'error', message: 'Server error', error: error.message });
     }
 };
+
+const getReviewsForASeller = async (req, res) => {
+    const { sellerId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(sellerId)) {
+        return res.status(400).json({ status: 'error', message: 'Invalid seller ID' });
+    }
+    try {
+        // Get pagination parameters from query
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        // Count total reviews for the seller for pagination metadata
+        const totalReviews = await Review.countDocuments({ seller: sellerId });
+        
+        // Get paginated seller reviews
+        const reviews = await Review.find({ seller: sellerId })
+            .skip(skip)
+            .limit(limit)
+            .populate('user', 'username')
+            .populate('product', 'name')
+            .lean();
+
+        // Return reviews with pagination metadata
+        res.json({
+            reviews,
+            pagination: {
+                totalReviews,
+                totalPages: Math.ceil(totalReviews / limit),
+                currentPage: page,
+                limit
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Server error', error: error.message });
+    }
+}
 
 // Get reviews for a specific product (approved only)
 const getApprovedReviewsForProduct = async (req, res) => {
@@ -39,11 +76,36 @@ const getApprovedReviewsForProduct = async (req, res) => {
 // Get all unapproved reviews
 const getUnapprovedReviews = async (req, res) => {
     try {
-        const reviews = await Review.find({ approved: false }).populate('user', 'username').populate('product', 'name').lean();
+        // Get pagination parameters from query
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        // Count total unapproved reviews for pagination metadata
+        const totalReviews = await Review.countDocuments({ approved: false });
+        
+        // Get paginated unapproved reviews
+        const reviews = await Review.find({ approved: false })
+            .skip(skip)
+            .limit(limit)
+            .populate('user', 'username')
+            .populate('product', 'name')
+            .lean();
+
         if (!reviews.length) {
             return res.status(404).json({ status: 'error', message: 'No unapproved reviews found' });
         }
-        res.json({ status: 'success', data: reviews });
+
+        // Return reviews with pagination metadata
+        res.json({
+            reviews,
+            pagination: {
+                totalReviews,
+                totalPages: Math.ceil(totalReviews / limit),
+                currentPage: page,
+                limit
+            }
+        });
     } catch (error) {
         res.status(500).json({ status: 'error', message: 'Server error', error: error.message });
     }
@@ -126,6 +188,7 @@ const deleteReview = async (req, res) => {
 
 module.exports = {
     getReviewsOfUser,
+    getReviewsForASeller,
     getApprovedReviewsForProduct,
     getUnapprovedReviews,
     getApprovedReviews,

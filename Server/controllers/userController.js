@@ -257,11 +257,33 @@ const searchUsers = async (req, res) => {
 // Get all users
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find().lean();
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        // Count total users for pagination metadata
+        const totalUsers = await User.countDocuments();
+        
+        // Get paginated users
+        const users = await User.find()
+            .skip(skip)
+            .limit(limit)
+            .lean();
+
         if (!users.length) {
             return res.status(400).json({ message: 'No users found' });
         }
-        res.json(users);
+
+        // Return users with pagination metadata
+        res.json({
+            users,
+            pagination: {
+                totalUsers,
+                totalPages: Math.ceil(totalUsers / limit),
+                currentPage: page,
+                limit
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

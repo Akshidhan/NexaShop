@@ -49,11 +49,7 @@ const ProductSchema = new mongoose.Schema(
                 type: Number,
                 required: true,
                 min: 0
-            },
-            images: [{
-                url: String,
-                publicId: String
-            }]
+            }
         }],
 
         mainImage: {
@@ -71,7 +67,7 @@ const ProductSchema = new mongoose.Schema(
         status: {
             type: String,
             enum: ['active', 'inactive'],
-            default: 'active'
+            default: 'inactive'
         }
     }
 );

@@ -1,0 +1,21 @@
+// Styles for the Reviews management page
+// Containing any specific styling for the reviews component
+
+// Star rating styles (additional styling if needed)
+.star-rating {
+  display: flex;
+  align-items: center;
+}
+
+// Review comment styles
+.review-comment {
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Action button styles
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}

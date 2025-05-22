@@ -1,9 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 const initialState = {
   currentUser: null,
   isAuthenticated: false,
-  isAdmin: false,
+  role: null,
   loading: false,
   error: null
 };
@@ -17,35 +18,44 @@ const userSlice = createSlice({
       state.error = null;
     },
     loginSuccess: (state, action) => {
+      console.log("Login Success Payload:", action.payload); // Debug payload
+      
       state.loading = false;
       state.isAuthenticated = true;
-      state.currentUser = action.payload.user;
-      state.role = action.paylooad.user.role;
-      // Note: You'll need to store the token in your login component
-      // localStorage.setItem('token', action.payload.accessToken);
+      state.currentUser = action.payload.id;
+      state.role = action.payload.role; // Explicitly ensure role is set
+
+      // Log the state after update for debugging
+      console.log("Redux state after login:", {
+        isAuthenticated: state.isAuthenticated,
+        currentUser: state.currentUser,
+        role: state.role
+      });
+
+      if (action.payload.accessToken) {
+        localStorage.setItem('token', action.payload.accessToken);
+      }
     },
     loginFailure: (state, action) => {
       state.loading = false;
-      state.error = action.payload || 'Login failed';
-    },
-    fetchProfileStart: (state) => {
-      state.loading = true;
-    },
-    fetchProfileSuccess: (state, action) => {
-      state.loading = false;
-      state.currentUser = action.payload;
-      state.isAdmin = action.payload?.role === 'admin';
-      state.isAuthenticated = true;
-    },
-    fetchProfileFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload || 'Failed to fetch profile';
+      state.error = action.payload?.errorMessage || 'Login failed';
     },
     logout: (state) => {
-      localStorage.removeItem('token');
+      // Set the state changes first (synchronous)
       state.currentUser = null;
       state.isAuthenticated = false;
-      state.isAdmin = false;
+      state.role = null;
+      state.loading = false;
+      // Remove token
+      localStorage.removeItem('token');
+      
+      axios.post(`${import.meta.env.VITE_BASE_URL}/auth/logout`, {
+        withCredentials: true
+      })
+        .then(response => {
+          console.log('Logout successful:', response.data);
+      })
+        .catch(error => console.error('Logout API error:', error));
     },
     clearError: (state) => {
       state.error = null;
@@ -56,12 +66,10 @@ const userSlice = createSlice({
 export const { 
   loginStart, 
   loginSuccess, 
-  loginFailure, 
-  fetchProfileStart,
-  fetchProfileSuccess,
-  fetchProfileFailure,
-  logout, 
+  loginFailure,
+  logout,
   clearError 
 } = userSlice.actions;
+
 
 export default userSlice.reducer;

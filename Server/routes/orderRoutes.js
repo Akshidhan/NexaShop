@@ -6,6 +6,10 @@ const verifyJWT = require('../middleware/verifyJWT');
 const verifyRoles = require('../middleware/verifyRoles');
 const verifyUser = require('../middleware/verifyUser');
 
+router.get('/seller/:sellerId', verifyJWT, verifyRoles('Seller'), orderController.getFinishedOrdersBySeller);
+router.get('/seller/:sellerId/pending', verifyJWT, verifyRoles('Seller'), orderController.getPendingOrdersBySeller);
+router.get('/seller/:sellerId/pending-payment', verifyJWT, verifyRoles('Seller'), orderController.getPendingPaymentOrdersBySeller);
+
 router.get('/pending', verifyJWT, verifyRoles('Admin'), orderController.getPendingOrders);
 router.get('/user/:id', verifyJWT, verifyRoles('User', 'Admin'), verifyUser, orderController.getOrdersOfUser);
 router.get('/:id', verifyJWT, orderController.getOrderById);

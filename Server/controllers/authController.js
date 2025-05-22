@@ -19,9 +19,9 @@ const login = async (req, res) => {
         let user;
         if(role === 'admin') {
             user = await Admin.findOne({ username }).exec();
-        } else if ( role === 'seller') {
+        } else if (role === 'seller') {
             user = await Seller.findOne({ username }).exec();
-        } else if( role === 'user') {
+        } else if(role === 'user') {
             user = await User.findOne({ username }).exec();
         }
 
@@ -35,36 +35,49 @@ const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid password' });
         }
 
-        const accessToken = jwt.sign({
-            UserInfo: {
-                id: user._id,
-                username: user.username,
-                role: role
+        // Create access token (short-lived)
+        const accessToken = jwt.sign(
+            {
+                UserInfo: {
+                    id: user._id,
+                    username: user.username,
+                    role: role
+                }
             },
-        },process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '15m' }
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '15m' }
         );
 
+        // Create refresh token (longer-lived)
         const refreshToken = jwt.sign(
             {
                 UserInfo: {
                     id: user._id,
                     username: user.username,
                     role: role
-                },
+                }
             },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '1d' }
         );
 
-        res.cookie('jwt', accessToken, {
+        // Store refresh token in HTTP-only cookie
+        res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'Strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000    
+            maxAge: 24 * 60 * 60 * 1000 // 1 day (matching refresh token expiry)
         });
 
-        res.status(200).json({ accessToken });
+        // Send access token to client
+        res.status(200).json({ 
+            accessToken,
+            user: {
+                id: user._id
+            }
+        });
     } catch (error) {
+        console.error('Login error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 }
@@ -72,44 +85,76 @@ const login = async (req, res) => {
 const refresh = async (req, res) => {
     const cookies = req.cookies;
 
-    if (!cookies?.jwt) {
-        return res.status(401).json({ message: 'Unauthorized' });
+    // Check if JWT cookie exists
+    if (!cookies?.refreshToken) {
+        return res.status(401).json({ message: 'Unauthorized - No refresh token' });
     }
 
-    const refreshToken = cookies.jwt;
+    const refreshToken = cookies.refreshToken;
 
     try {
+        // Verify the refresh token
         jwt.verify(
             refreshToken,
             process.env.REFRESH_TOKEN_SECRET,
             (err, decoded) => {
-                if (err) return res.status(403).json({ message: 'Forbidden' });
+                if (err) {
+                    console.error('Refresh token error:', err.message);
+                    return res.status(403).json({ message: 'Forbidden - Invalid refresh token' });
+                }
 
+                // Create new access token
                 const accessToken = jwt.sign(
                     {
                         UserInfo: {
                             id: decoded.UserInfo.id,
                             username: decoded.UserInfo.username,
                             role: decoded.UserInfo.role
-                        },
+                        }
                     },
                     process.env.ACCESS_TOKEN_SECRET,
-                    { expiresIn: '10m' }
+                    { expiresIn: '15m' } // Consistent with login
                 );
 
-                res.status(200).json({ accessToken });
+                // Send new access token
+                return res.status(200).json({ 
+                    accessToken,
+                    user: {
+                        id: decoded.UserInfo.id,
+                        username: decoded.UserInfo.username,
+                        role: decoded.UserInfo.role
+                    }
+                });
             }
         );
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        console.error('Refresh error:', error);
+        return res.status(500).json({ message: 'Server error during token refresh' });
     }
 }
 
 const logout = (req, res) => {
-    const cookies = req.cookies
-    if (!cookies?.jwt) return res.sendStatus(204) 
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true })
-    res.json({ message: 'Cookie cleared' })
+    try {
+        const cookies = req.cookies;
+        
+        if (!cookies?.refreshToken) {
+            return res.sendStatus(204); // No content to send back
+        }
+        
+        // Clear the JWT cookie with same settings as when it was created
+        // Note: Using 'Strict' in login but 'None' in logout - making this consistent with login
+        res.clearCookie('refreshToken', { 
+            httpOnly: true, 
+            secure: true, 
+            sameSite: 'Strict',
+            maxAge: 0
+        });
+        
+        return res.status(200).json({ message: 'Logout successful' });
+    } catch (error) {
+        console.error('Logout error:', error);
+        return res.status(500).json({ message: 'Server error during logout' });
+    }
 }
 
 module.exports = {

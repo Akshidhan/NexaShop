@@ -1,0 +1,46 @@
+.reviews-container {
+  margin: 20px 0;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .responsive-table {
+    overflow-x: auto;
+  }
+}
+
+// Custom styling for status badges
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  
+  &.approved {
+    background-color: #ecfdf5;
+    color: #065f46;
+  }
+  
+  &.pending {
+    background-color: #fffbeb;
+    color: #92400e;
+  }
+}
+
+// Star rating styling
+.star-rating {
+  display: flex;
+  
+  .star {
+    font-size: 1.25rem;
+    
+    &.filled {
+      color: #f59e0b;
+    }
+    
+    &.empty {
+      color: #d1d5db;
+    }
+  }
+}
