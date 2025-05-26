@@ -1,0 +1,647 @@
+@use "sass:color";
+
+// Color variables based on the specified colors
+$color-primary: #000000;
+$color-secondary: #73787C;
+$color-accent: #B6B6D5;
+$color-light: #f8f9fa;
+$color-white: #ffffff;
+$color-error: #dc2626;
+$color-success: #10b981;
+$color-warning: #f59e0b;
+
+.userpanel-container {
+  display: flex;
+  min-height: calc(100vh - 120px);
+  background-color: $color-light;
+  font-family: 'Montserrat', sans-serif;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+// Sidebar styling
+.userpanel-sidebar {
+  width: 250px;
+  background-color: $color-white;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  padding: 2rem 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding: 1rem 0;
+  }
+  
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 1.5rem 1.5rem;
+    border-bottom: 1px solid rgba($color-secondary, 0.2);
+    
+    .user-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      border: 3px solid $color-accent;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: $color-primary;
+      margin: 0;
+    }
+  }
+}
+
+// Navigation styling
+.userpanel-nav {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1.5rem;
+  
+  .nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    color: $color-secondary;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background-color: rgba($color-accent, 0.1);
+      color: $color-primary;
+    }
+    
+    &.active {
+      background-color: rgba($color-accent, 0.2);
+      color: $color-primary;
+      font-weight: 600;
+      border-left: 4px solid $color-accent;
+    }
+    
+    .nav-icon {
+      font-size: 1.25rem;
+      margin-right: 0.75rem;
+    }
+    
+    span {
+      font-size: 0.95rem;
+    }
+  }
+}
+
+// Main content styling
+.userpanel-content {
+  flex: 1;
+  padding: 2rem;
+  background-color: $color-light;
+  
+  .content-section {
+    background-color: $color-white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    
+    h2 {
+      font-size: 1.5rem;
+      color: $color-primary;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      border-bottom: 2px solid $color-accent;
+      padding-bottom: 0.75rem;
+    }
+    
+    form {
+      max-width: 500px;
+      
+      .form-group {
+        margin-bottom: 1.25rem;
+        
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+          color: $color-secondary;
+        }
+        
+        input {
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border: 1px solid rgba($color-secondary, 0.3);
+          border-radius: 4px;
+          font-size: 1rem;
+          transition: border-color 0.3s ease;
+          
+          &:focus {
+            border-color: $color-accent;
+            outline: none;
+          }
+        }
+        
+        &.password-group {
+          .password-input {
+            position: relative;
+            
+            .toggle-password {
+              position: absolute;
+              right: 10px;
+              top: 50%;
+              transform: translateY(-50%);
+              background: none;
+              border: none;
+              color: $color-secondary;
+              cursor: pointer;
+              
+              &:hover {
+                color: $color-primary;
+              }
+            }
+          }
+        }
+      }
+      
+      .btn-submit {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: $color-primary;
+        color: $color-white;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 1rem;
+        
+        &:hover {
+          background-color: color.adjust($color-primary, $lightness: -10%);
+        }
+        
+        &:disabled {
+          background-color: $color-secondary;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+  
+  // File input styling
+  .file-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+  }
+  
+  .file-input-label {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: $color-accent;
+    color: $color-white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    text-align: center;
+    transition: background-color 0.3s;
+    
+    &:hover {
+      background-color: color.adjust($color-accent, $lightness: -10%);
+    }
+  }
+  
+  // Profile image preview
+  .profile-image-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 1.5rem;
+    border: 3px solid $color-accent;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+  
+  // Orders styling
+  .orders-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+    
+    .order-card {
+      background-color: $color-white;
+      border-radius: 8px;
+      padding: 1.25rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba($color-secondary, 0.1);
+      
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba($color-secondary, 0.1);
+        
+        h3 {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: $color-primary;
+          margin: 0;
+        }
+        
+        .order-status {
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          
+          &.delivered {
+            background-color: rgba($color-success, 0.1);
+            color: $color-success;
+          }
+          
+          &.processing {
+            background-color: rgba($color-warning, 0.1);
+            color: $color-warning;
+          }
+          
+          &.cancelled {
+            background-color: rgba($color-error, 0.1);
+            color: $color-error;
+          }
+        }
+      }
+      
+      .order-details {
+        margin-bottom: 1rem;
+        
+        .detail-item {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 0.5rem;
+          
+          .detail-label {
+            color: $color-secondary;
+            font-size: 0.9rem;
+          }
+          
+          .detail-value {
+            font-weight: 500;
+            color: $color-primary;
+          }
+        }
+      }
+      
+      .btn-view-details {
+        width: 100%;
+        padding: 0.6rem;
+        background-color: transparent;
+        border: 1px solid $color-accent;
+        color: $color-accent;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        
+        &:hover {
+          background-color: $color-accent;
+          color: $color-white;
+        }
+      }
+    }
+  }
+  
+  // Reviews styling
+  .reviews-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    
+    .review-card {
+      background-color: $color-white;
+      border-radius: 8px;
+      padding: 1.25rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba($color-secondary, 0.1);
+      
+      .product-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: $color-primary;
+        margin: 0 0 0.5rem 0;
+      }
+      
+      .rating {
+        display: flex;
+        margin-bottom: 0.75rem;
+        
+        .star {
+          color: #d1d5db;
+          font-size: 1.25rem;
+          
+          &.filled {
+            color: $color-accent;
+          }
+        }
+      }
+      
+      .review-comment {
+        color: $color-secondary;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 1.25rem;
+        min-height: 60px;
+      }
+      
+      .review-actions {
+        display: flex;
+        gap: 0.75rem;
+        
+        button {
+          flex: 1;
+          padding: 0.6rem;
+          border-radius: 4px;
+          font-size: 0.9rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+        
+        .btn-edit {
+          background-color: transparent;
+          border: 1px solid $color-accent;
+          color: $color-accent;
+          
+          &:hover {
+            background-color: $color-accent;
+            color: $color-white;
+          }
+        }
+        
+        .btn-delete {
+          background-color: transparent;
+          border: 1px solid $color-error;
+          color: $color-error;
+          
+          &:hover {
+            background-color: $color-error;
+            color: $color-white;
+          }
+        }
+      }
+    }
+  }
+  
+  // Loading and empty states
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: $color-secondary;
+    font-size: 1rem;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: $color-secondary;
+    border: 2px dashed rgba($color-secondary, 0.2);
+    border-radius: 8px;
+    
+    p {
+      font-size: 1rem;
+    }
+  }
+
+  // Address Book Styles
+  .address-book-container {
+    .address-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+
+      .address-card {
+        position: relative;
+        background-color: $color-white;
+        border-radius: 8px;
+        padding: 1.25rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba($color-secondary, 0.1);
+        transition: all 0.3s ease;
+
+        &.default {
+          border: 2px solid $color-accent;
+
+          .default-badge {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background-color: $color-accent;
+            color: $color-white;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+          }
+        }
+
+        .address-content {
+          .address-details {
+            p {
+              margin: 0.25rem 0;
+              color: $color-primary;
+            }
+          }
+
+          .address-actions {
+            margin-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+
+            button {
+              padding: 0.4rem 0.8rem;
+              border-radius: 4px;
+              font-size: 0.8rem;
+              font-weight: 500;
+              cursor: pointer;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              gap: 0.25rem;
+              
+              svg {
+                font-size: 1rem;
+              }
+            }
+
+            .btn-edit {
+              background-color: transparent;
+              border: 1px solid $color-accent;
+              color: $color-accent;
+              
+              &:hover {
+                background-color: $color-accent;
+                color: $color-white;
+              }
+            }
+
+            .btn-default {
+              background-color: transparent;
+              border: 1px solid $color-secondary;
+              color: $color-secondary;
+              
+              &:hover {
+                background-color: $color-secondary;
+                color: $color-white;
+              }
+            }
+
+            .btn-delete {
+              background-color: transparent;
+              border: 1px solid $color-error;
+              color: $color-error;
+              
+              &:hover {
+                background-color: $color-error;
+                color: $color-white;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .btn-add-address {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: $color-primary;
+    color: $color-white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 1rem auto;
+    
+    svg {
+      font-size: 1.1rem;
+    }
+    
+    &:hover {
+      background-color: color.adjust($color-primary, $lightness: -10%);
+    }
+  }
+
+  .address-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    
+    h3 {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      color: $color-primary;
+      font-weight: 600;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      
+      @media (max-width: 600px) {
+        flex-direction: column;
+        gap: 0;
+      }
+      
+      .form-group {
+        flex: 1;
+      }
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      
+      input[type="checkbox"] {
+        width: auto;
+        margin-right: 0.5rem;
+      }
+      
+      label {
+        margin-bottom: 0;
+      }
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      
+      button {
+        padding: 0.75rem 1.5rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      
+      .btn-submit {
+        background-color: $color-primary;
+        color: $color-white;
+        border: none;
+        flex: 1;
+        
+        &:hover {
+          background-color: color.adjust($color-primary, $lightness: -10%);
+        }
+      }
+      
+      .btn-cancel {
+        background-color: transparent;
+        border: 1px solid $color-secondary;
+        color: $color-secondary;
+        
+        &:hover {
+          background-color: $color-secondary;
+          color: $color-white;
+        }
+      }
+    }
+  }
+}

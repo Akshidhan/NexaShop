@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import './signup.scss';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 
 import signin from '/signin.jpg';
 import logo from '/Nexashop.png';

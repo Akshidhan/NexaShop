@@ -4,7 +4,9 @@ const Cart = require('../models/cart.model');
 const getCartDetailById = async (req, res) => {
     const { id } = req.params;
     try {
-        const cart = await Cart.findOne({ user: id }).lean();
+        const cart = await Cart.findOne({ user: id })
+            .populate('items.product')
+            .lean();
         if (!cart) {
             return res.status(404).json({ message: 'User and cart not found' });
         }
@@ -46,7 +48,8 @@ const updateCart = async (req, res) => {
             { user: id },
             { items },
             { new: true }
-        );
+        ).populate('items.product');
+        
         if (!updatedCart) {
             return res.status(404).json({ message: 'Cart not found' });
         }

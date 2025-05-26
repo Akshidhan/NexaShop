@@ -10,7 +10,7 @@
 }
 
 .search-input{
-    border: none;
+    border: none !important;
     padding: 10px;
     font-size: 16px;
     padding-inline: 20px;

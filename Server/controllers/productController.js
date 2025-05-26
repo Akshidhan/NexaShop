@@ -123,7 +123,10 @@ const getProductById = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const product = await Product.findById(id).lean();
+        const product = await Product.findById(id)
+            .lean()
+            .populate('seller', 'sellerName')
+            .populate('category', 'name');
 
         if (!product) {
             return res.status(400).json({ message: 'Product not found' });

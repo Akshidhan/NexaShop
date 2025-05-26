@@ -9,7 +9,9 @@ const getReviewsOfUser = async (req, res) => {
         return res.status(400).json({ status: 'error', message: 'Invalid user ID' });
     }
     try {
-        const reviews = await Review.find({ user: id }).populate('product', 'name').lean();
+        const reviews = await Review.find({ user: id })
+            .populate('product', 'name')
+            .lean();
         if (!reviews.length) {
             return res.status(404).json({ status: 'error', message: 'No reviews found for this user' });
         }

@@ -53,7 +53,7 @@ function Signin() {
             }
         } catch (error) {
             console.error("Login error:", error);
-            const errorMessage = error.response?.data?.message || "Login failed. Please try again.";
+            const errorMessage = error.response?.data?.message;
             dispatch(loginFailure({errorMessage}));
         }
     };
@@ -102,7 +102,11 @@ function Signin() {
                         <div className="form-options flex justify-end">
                             <a href="" className="forgot-password">Forgot password?</a>
                         </div>
-                        
+                        {error && (
+                            <div className="error-message mt-3 text-red-500 text-sm">
+                                {typeof error === 'object' ? error.errorMessage : error}
+                            </div>
+                        )}
                         <button type="submit" className="signin-button">Sign In</button>
                     </form>
                     

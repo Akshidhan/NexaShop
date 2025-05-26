@@ -19,6 +19,10 @@ import Home from "./pages/home/Homepage.jsx";
 import Signin from "./pages/home/pages/signin/Signin.jsx";
 import Signup from "./pages/home/pages/signup/Signup.jsx";
 import Userpanel from "./pages/home/pages/userpanel/Userpanel.jsx";
+import Cart from "./pages/home/pages/cart/Cart.jsx";
+import Checkout from "./pages/home/pages/checkout/Checkout.jsx";
+import OrderConfirmation from "./pages/home/pages/order-confirmation/OrderConfirmation.jsx";
+import ProductView from "./pages/home/pages/productView/ProductView.jsx";
 
 // Importing the admin components
 import AdminDashboard from "./pages/admin/pages/dashboard/Dashboard.jsx";
@@ -113,6 +117,10 @@ function App() {
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/userpanel" element={<Userpanel />} />
+          <Route path='/cart' element={<Cart />} />
+          <Route path='/checkout' element={<Checkout />} />
+          <Route path='/order-confirmation' element={<OrderConfirmation />} />
+          <Route path='/product/:productId' element={<ProductView />} />
 
           {/*Seller Routes*/}
           <Route path="/seller/login" element={<SellerLogin />} />

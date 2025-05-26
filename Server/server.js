@@ -10,10 +10,12 @@ dotenv.config()
 
 const PORT = process.env.PORT || 3000
 
-// Connect to MongoDB
 connectDB()
 
+// Special route for Stripe webhooks needs raw body
+app.use('/payments/webhook', express.raw({ type: 'application/json' }));
 
+// Standard middleware for other routes
 app.use(express.json())
 app.use(cookieParser())
 

@@ -28,7 +28,7 @@ function Navbar() {
   return (
     <div className="w-full flex items-center justify-between px-20 py-[30px]">
         <div className="logo">
-            <img src={logo} alt="" className='w-[200px]'/>
+            <Link to='/'><img src={logo} alt="" className='w-[200px]'/></Link>
         </div>
         <div className="flex items-center justify-center gap-2 search">
             <input type="text" placeholder='Search for products, brands and more' className='search-input'/>

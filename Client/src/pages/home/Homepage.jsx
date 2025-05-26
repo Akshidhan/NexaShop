@@ -1,6 +1,7 @@
 import Navbar from './components/navbar/Navbar'
 import ProductCarousel from './components/carousel/ProductCarousel'
 import Footer from './components/footer/Footer'
+import FloatingCart from './components/floatingCart/FloatingCart'
 import api from '../../utils/axios'
 
 import hero from '/image.png'
@@ -89,6 +90,7 @@ function Homepage() {
             </div>
 
             <Footer />
+            <FloatingCart />
         </>
     )
 }

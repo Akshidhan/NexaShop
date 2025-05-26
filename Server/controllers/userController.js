@@ -89,58 +89,87 @@ const addUserImage = async (req, res) => {
         return res.status(400).json({ message: 'Image not uploaded'});
     }
 
-    if(!req.query.id) {
+    const { id } = req.params;
+    if(!id) {
         return res.status(400).json({ message: 'User ID not provided'});
     }
 
-    var user
-
-    if(req.param.role === 'User') {
-        const user = await User.findById(req.params.id);
-        if (!user) {
-            return res.status(400).json({ message: 'User not found' });
-        }
-    } else if (req.param.role === 'Seller') {
-        const user = await Seller.findById(req.params.id);
-        if (!user) {
-            return res.status(400).json({ message: 'Seller not found' });
-        }
-    }
-
+    let user;
+     
+    // Get user based on their ID, regardless of role
     try {
-        if(user.userImage) {
-            await cloudinary.uploader.destroy(user.userImage.publicId);
-            user.userImage = {
-                url: undefined,
-                publicId: undefined
-            };
+        user = await User.findById(id);
+        if (!user) {
+            // Try to find as seller if not found as regular user
+            user = await Seller.findById(id);
+            if (!user) {
+                return res.status(400).json({ message: 'User not found' });
+            }
         }
-
-        const cloudinaryResult = await new Promise((resolve, reject) => {
-            cloudinary.uploader.upload_stream(
-              {
-                folder: 'ecommerce-products',
-                format: 'webp',
-                quality: 'auto'
-              },
-              (error, result) => {
-                if (error) reject(error);
-                else resolve(result);
-              }
-            ).end(req.file.buffer);
+        
+        // Delete old image if it exists and has a publicId
+        if (user.userImage && user.userImage.publicId) {
+            try {
+                await cloudinary.uploader.destroy(user.userImage.publicId);
+            } catch (deleteError) {
+                console.error("Error deleting old image:", deleteError);
+                // Continue with upload even if delete fails
+            }
+        }
+        
+        try {
+            // Upload new image to Cloudinary
+            const cloudinaryResult = await new Promise((resolve, reject) => {
+                cloudinary.uploader.upload_stream(
+                  {
+                    folder: 'ecommerce-users',
+                    format: 'webp',
+                    quality: 'auto'
+                  },
+                  (error, result) => {
+                    if (error) {
+                        console.error("Cloudinary upload error:", error);
+                        reject(error);
+                    } else {
+                        resolve(result);
+                    }
+                  }
+                ).end(req.file.buffer);
+            });
+            
+            user.userImage = {
+                url: cloudinaryResult.secure_url,
+                publicId: cloudinaryResult.public_id
+            };
+            
+            await user.save();
+            
+            return res.status(200).json({ 
+                message: 'Image uploaded successfully',
+                userImage: user.userImage
+            });
+            
+        } catch (uploadError) {
+            console.error("Upload error:", uploadError);
+            
+            user.userImage = {
+                url: "https://via.placeholder.com/150",
+                publicId: "error-placeholder"
+            };
+            
+            await user.save();
+            
+            return res.status(207).json({
+                message: 'Image saved with placeholder due to upload error',
+                error: uploadError.message
+            });
+        }
+    } catch (error) {
+        console.error("Server error:", error);
+        return res.status(500).json({ 
+            message: 'Server error', 
+            error: error.message 
         });
-
-        user.userImage = {
-            url: cloudinaryResult.secure_url,
-            publicId: cloudinaryResult.public_id
-        };
-
-        await user.save();
-
-        return res.json({message: 'Image uploaded successfully '});
-    }
-    catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
     }
 }
 

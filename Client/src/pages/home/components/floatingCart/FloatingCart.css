@@ -1,0 +1,162 @@
+/* FloatingCart.css */
+.floating-cart {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.floating-cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #4CAF50;
+  color: white;
+  cursor: pointer;
+}
+
+.cart-icon {
+  position: relative;
+  font-size: 1.2rem;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ff5722;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-total {
+  font-weight: 600;
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1rem;
+}
+
+.floating-cart-content {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.mini-cart-items {
+  padding: 0 16px;
+}
+
+.mini-cart-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.mini-cart-item img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 12px;
+}
+
+.mini-item-details {
+  flex: 1;
+}
+
+.mini-item-name {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-item-price {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.more-items {
+  text-align: center;
+  padding: 10px;
+  font-size: 0.8rem;
+  color: #666;
+  background: #f5f5f5;
+}
+
+.mini-cart-actions {
+  display: flex;
+  padding: 16px;
+  gap: 8px;
+  justify-content: space-between; /* Ensure equal spacing */
+}
+
+.view-cart-btn,
+.checkout-btn {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  border-radius: 4px;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  width: 50%;
+  box-sizing: border-box;
+  display: inline-block;
+  margin: 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-cart-btn {
+  background: #f1f1f1;
+  color: #333;
+}
+
+.view-cart-btn:hover {
+  background: #e3e3e3;
+}
+
+.checkout-btn {
+  background: #4CAF50;
+  color: white;
+  margin: 0 !important;
+}
+
+.checkout-btn:hover {
+  background: #43a047;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .floating-cart {
+    width: calc(100% - 40px);
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+  }
+}

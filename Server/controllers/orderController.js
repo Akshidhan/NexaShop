@@ -70,8 +70,19 @@ const getOrdersOfUser = async (req, res) => {
     }
     try {
         const orders = await Order.find({ user: id }).lean();
-        res.json(orders);
+        
+        // Format orders for frontend display
+        const formattedOrders = orders.map(order => ({
+            id: order._id.toString(),
+            date: new Date(order.createdAt).toISOString().split('T')[0],
+            status: order.status.charAt(0).toUpperCase() + order.status.slice(1),
+            items: order.items.length, // Count of items instead of the array
+            total: order.total
+        }));
+        
+        res.json(formattedOrders);
     } catch (error) {
+        console.error(`Error fetching orders for user ${id}:`, error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
@@ -93,8 +104,8 @@ const createOrder = async (req, res) => {
             total,
             shippingAddress
         });
-        await newOrder.save();
-        res.status(201).json({ message: 'Order created successfully' });
+        const savedOrder = await newOrder.save();
+        res.status(201).json({ message: 'Order created successfully', _id: savedOrder._id });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -125,7 +136,6 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
-// PUT /payment/:orderId - Change the payment status of a payment
 const updatePaymentStatus = async (req, res) => {
     const { orderId } = req.params;
     const { paymentStatus } = req.body;
@@ -138,14 +148,19 @@ const updatePaymentStatus = async (req, res) => {
     try {
         const updatedOrder = await Order.findByIdAndUpdate(
             orderId,
-            { paymentStatus },
+            { 
+                paymentStatus,
+                paidAt: paymentStatus === 'paid' ? new Date() : undefined
+            },
             { new: true }
         );
         if (!updatedOrder) {
             return res.status(404).json({ message: 'Order not found' });
         }
+        
         res.json(updatedOrder);
     } catch (error) {
+        console.error('Error updating payment status:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
