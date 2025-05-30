@@ -47,23 +47,16 @@ function App() {
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        
-        console.log('JWT payload:', payload);
 
-        // Extract ID and role from the token payload
-        // Check for different possible structures of the token
         let userId, userRole;
         
         if (payload.UserInfo) {
-          // If the token has a UserInfo structure
           userId = payload.UserInfo.id;
           userRole = payload.UserInfo.role;
         } else if (payload.id && payload.role) {
-          // If the token has direct id and role properties
           userId = payload.id;
           userRole = payload.role;
         } else if (payload.sub) {
-          // Some JWT tokens use 'sub' for the subject (user id)
           userId = payload.sub;
           userRole = payload.role || payload.authorities;
         }
